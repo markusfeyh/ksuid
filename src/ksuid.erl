@@ -3,8 +3,12 @@
 %% API exports
 -export([generate/0, parse/1]).
 
--ifdef(TEST).
+%% Not part of the API. Exported (and called as ksuid:get_bytes/0 from
+%% generate/0) so the tests can intercept it with meck.
 -export([get_bytes/0]).
+
+-ifdef(TEST).
+-export([apply_padding/1]).
 -endif.
 
 -define(EPOCH, 1400000000).
@@ -31,16 +35,16 @@ generate() ->
   KSUID62 = base62:encode(KSUIDBin),
   apply_padding(KSUID62).
 
--spec parse(string()) -> {ok, elrang:datetime(), binary()}.
+%% The returned datetime is in UTC.
+-spec parse(string()) -> {ok, calendar:datetime(), binary()}.
 parse(KSUID) ->
   Decoded = base62:decode(KSUID),
   <<Timestamp:32/integer, Random_Bytes/binary>> = <<Decoded:160/integer>>,
-  {ok, calendar:system_time_to_local_time(Timestamp + ?EPOCH, second), Random_Bytes}.
+  {ok, calendar:system_time_to_universal_time(Timestamp + ?EPOCH, second), Random_Bytes}.
 
 %%====================================================================
 %% Internal functions
 %%====================================================================
 
 apply_padding(KSUID62) ->
-  Pad = ?KSUID_ENCODED_LENGTH - length(KSUID62),
-  lists:flatten(string:pad(KSUID62, Pad, leading, 48)).
+  lists:flatten(string:pad(KSUID62, ?KSUID_ENCODED_LENGTH, leading, $0)).
