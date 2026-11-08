@@ -23,3 +23,10 @@ simple_test() ->
 parse_reference_test() ->
   ?assertEqual({ok, {{2017, 10, 10}, {4, 0, 47}}, <<16#B5A1CD34B5F99D1154FB6853345C9735:128>>},
                ksuid:parse("0ujtsYcgvSTl8PAuAdqWYSMnLOv")).
+
+%% KSUIDs whose timestamp is before 2018-02-02 encode to fewer than 27
+%% base62 characters and must be left-padded with "0".
+padding_test() ->
+  Raw = 16#0669F7EFB5A1CD34B5F99D1154FB6853345C9735,
+  ?assertEqual("0ujtsYcgvSTl8PAuAdqWYSMnLOv", ksuid:apply_padding(base62:encode(Raw))),
+  ?assertEqual(lists:duplicate(27, $0), ksuid:apply_padding(base62:encode(0))).

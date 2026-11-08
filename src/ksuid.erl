@@ -7,6 +7,10 @@
 %% generate/0) so the tests can intercept it with meck.
 -export([get_bytes/0]).
 
+-ifdef(TEST).
+-export([apply_padding/1]).
+-endif.
+
 -define(EPOCH, 1400000000).
 -define(PAYLOAD_LENGTH, 16).
 -define(KSUID_RAW_LENGTH, 20).
@@ -43,5 +47,4 @@ parse(KSUID) ->
 %%====================================================================
 
 apply_padding(KSUID62) ->
-  Pad = ?KSUID_ENCODED_LENGTH - length(KSUID62),
-  lists:flatten(string:pad(KSUID62, Pad, leading, 48)).
+  lists:flatten(string:pad(KSUID62, ?KSUID_ENCODED_LENGTH, leading, $0)).
