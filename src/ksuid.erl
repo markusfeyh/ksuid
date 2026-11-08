@@ -3,9 +3,9 @@
 %% API exports
 -export([generate/0, parse/1]).
 
--ifdef(TEST).
+%% Not part of the API. Exported (and called as ksuid:get_bytes/0 from
+%% generate/0) so the tests can intercept it with meck.
 -export([get_bytes/0]).
--endif.
 
 -define(EPOCH, 1400000000).
 -define(PAYLOAD_LENGTH, 16).
