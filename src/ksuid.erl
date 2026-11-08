@@ -31,11 +31,12 @@ generate() ->
   KSUID62 = base62:encode(KSUIDBin),
   apply_padding(KSUID62).
 
--spec parse(string()) -> {ok, elrang:datetime(), binary()}.
+%% The returned datetime is in UTC.
+-spec parse(string()) -> {ok, calendar:datetime(), binary()}.
 parse(KSUID) ->
   Decoded = base62:decode(KSUID),
   <<Timestamp:32/integer, Random_Bytes/binary>> = <<Decoded:160/integer>>,
-  {ok, calendar:system_time_to_local_time(Timestamp + ?EPOCH, second), Random_Bytes}.
+  {ok, calendar:system_time_to_universal_time(Timestamp + ?EPOCH, second), Random_Bytes}.
 
 %%====================================================================
 %% Internal functions
